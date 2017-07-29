@@ -1,0 +1,25 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "Y20DEtMtbfE9qTtmoi2NYV1x7aA=",
+			"path": "github.com/aws/aws-sdk-go/aws/session",
+			"revision": "b41fe4f7f4f766b81f5b0ce67f1358b72ed6d389",
+			"revisionTime": "2017-07-26T02:00:53Z"
+		},
+		{
+			"checksumSHA1": "F8XazqNQe3hKPlkRuX26aYkEA2g=",
+			"path": "github.com/aws/aws-sdk-go/service/ec2",
+			"revision": "b41fe4f7f4f766b81f5b0ce67f1358b72ed6d389",
+			"revisionTime": "2017-07-26T02:00:53Z"
+		},
+		{
+			"checksumSHA1": "9LeR7BH4PSu8LRDZ8bY7QY1HXJE=",
+			"path": "github.com/urfave/cli",
+			"revision": "4b90d79a682b4bf685762c7452db20f2a676ecb2",
+			"revisionTime": "2017-07-06T19:46:25Z"
+		}
+	],
+	"rootPath": "github.com/undeadops/herd"
+}
