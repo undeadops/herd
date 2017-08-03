@@ -12,6 +12,7 @@ var (
 	awsProfile    string
 	awsFilterName string
 	awsFilterTags string
+	verbose       bool
 )
 
 func main() {
