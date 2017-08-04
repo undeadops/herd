@@ -61,6 +61,18 @@ func main() {
 			},
 		},
 		{
+			Name:  "elb",
+			Usage: "AWS Elastic Loadbalancer",
+			Subcommands: []cli.Command{
+				{
+					Name:    "list",
+					Aliases: []string{"ls"},
+					Usage:   "List elastic loadbalancers",
+					Action:  elbList,
+				},
+			},
+		},
+		{
 			Name:    "template",
 			Aliases: []string{"t"},
 			Usage:   "options for task templates",

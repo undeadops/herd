@@ -15,6 +15,18 @@
 			"revisionTime": "2017-07-26T02:00:53Z"
 		},
 		{
+			"checksumSHA1": "zO981nwQtyThaU7UCG2bAYWjSXA=",
+			"path": "github.com/aws/aws-sdk-go/service/elb",
+			"revision": "ae48d7372b4f879cfe994d7a037a6a822cafdde0",
+			"revisionTime": "2017-08-01T23:37:04Z"
+		},
+		{
+			"checksumSHA1": "aEU9IPbfuS1PWY2T26gn41y+feA=",
+			"path": "github.com/fatih/color",
+			"revision": "67c513e5729f918f5e69786686770c27141a4490",
+			"revisionTime": "2017-08-04T15:04:06Z"
+		},
+		{
 			"checksumSHA1": "9LeR7BH4PSu8LRDZ8bY7QY1HXJE=",
 			"path": "github.com/urfave/cli",
 			"revision": "4b90d79a682b4bf685762c7452db20f2a676ecb2",
