@@ -27,6 +27,12 @@
 			"revisionTime": "2017-08-04T15:04:06Z"
 		},
 		{
+			"checksumSHA1": "VdvWgxaqcC3pKk/6Q7dRfH7THjM=",
+			"path": "github.com/mattn/go-colorable",
+			"revision": "6c0fd4aa6ec5818d5e3ea9e03ae436972a6c5a9a",
+			"revisionTime": "2017-08-02T01:54:08Z"
+		},
+		{
 			"checksumSHA1": "9LeR7BH4PSu8LRDZ8bY7QY1HXJE=",
 			"path": "github.com/urfave/cli",
 			"revision": "4b90d79a682b4bf685762c7452db20f2a676ecb2",

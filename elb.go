@@ -11,11 +11,23 @@ import (
 	"github.com/urfave/cli"
 )
 
+func printElb(elb []map[string]string) error {
+	for _, e := range elb {
+		fmt.Printf(
+			"%-45s\t%-3s\t%-2s:%-2s\t%-15s\t%-50s\n",
+			color.YellowString(e["name"]), e["numInstances"], color.GreenString(e["instances_in"]),
+			color.RedString(e["instances_out"]), e["scheme"], e["dns"])
+	}
+	return nil
+}
+
 func elbList(c *cli.Context) error {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 		Profile:           awsProfile,
 	}))
+
+	var elbList []map[string]string
 
 	elbsvc := elb.New(sess)
 
@@ -52,11 +64,17 @@ func elbList(c *cli.Context) error {
 			}
 		}
 
-		elbState := fmt.Sprintf("In: %-2s / Out: %-2s", color.GreenString(strconv.Itoa(inservice)), color.RedString(strconv.Itoa(noservice)))
+		elbInstance := map[string]string{
+			"name":          *lb.LoadBalancerName,
+			"numInstances":  strconv.Itoa(len(lb.Instances)),
+			"instances_in":  strconv.Itoa(inservice),
+			"instances_out": strconv.Itoa(noservice),
+			"scheme":        *lb.Scheme,
+			"dns":           *lb.DNSName,
+		}
 
-		fmt.Printf(
-			"%-45s\t%-4d\t%-15s\t%-15s\t%-50s\n",
-			color.YellowString(*lb.LoadBalancerName), len(lb.Instances), elbState, *lb.Scheme, *lb.DNSName)
+		elbList = append(elbList, elbInstance)
 	}
+	printElb(elbList)
 	return nil
 }
