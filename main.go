@@ -73,6 +73,18 @@ func main() {
 			},
 		},
 		{
+			Name:  "rds",
+			Usage: "AWS RDS",
+			Subcommands: []cli.Command{
+				{
+					Name:    "list",
+					Aliases: []string{"ls"},
+					Usage:   "List RDS Instances",
+					Action:  rdsList,
+				},
+			},
+		},
+		{
 			Name:    "template",
 			Aliases: []string{"t"},
 			Usage:   "options for task templates",
