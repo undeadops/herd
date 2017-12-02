@@ -17,3 +17,12 @@ checksum:
   # - Version (Git tag without `v` prefix)
   # Default is `{{ .ProjectName }}_{{ .Version }}_checksums.txt`.
   name_template: "{{ .ProjectName }}_checksums.txt"
+brew:
+  github:
+    owner: undeadops
+    name: homebrew-tap
+  folder: Formula
+  homepage:  https://github.com/undeadops/herd
+  description: AWS CLI for getting to the most needed info I use everyday but dont want to open the AWS Console to look up.
+  test: |
+    system "#{bin}/herd -v"
