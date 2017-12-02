@@ -10,7 +10,13 @@ projects.  Since they both are incomplete to what I wanted
 and I was looking for a project to learn Go.  I wrote herd
 as a way to do both.  
 
-## Install/Build
+## Install MacOS
+
+```sh
+brew install undeadops/tap/herd
+```
+
+## Build
 
 Building should be simply
 
