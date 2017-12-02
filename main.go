@@ -13,11 +13,18 @@ var (
 	awsFilterName string
 	awsFilterTags string
 	verbose       bool
-	version       = "master"
-	buildDate     string
 )
 
+// Capture Build information
+var version string
+var date string
+var commit string
+
 func main() {
+	cli.VersionPrinter = func(c *cli.Context) {
+		fmt.Printf("version=%s date=%s commit=%s\n", version, date, commit)
+	}
+
 	app := cli.NewApp()
 
 	app.Flags = []cli.Flag{
