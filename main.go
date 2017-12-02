@@ -13,6 +13,8 @@ var (
 	awsFilterName string
 	awsFilterTags string
 	verbose       bool
+	version       = "master"
+	buildDate     string
 )
 
 func main() {
