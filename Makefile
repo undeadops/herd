@@ -5,8 +5,7 @@ build:
 
 release:
 
-	if git rev-parse $(ver) >/dev/null 2>&1
-	then
+	git rev-parse -q --verify "refs/tags/$(ver)" >/dev/null; then
 	#GOOS=0 go build -ldflags "-X main.version ${rel} -X main.buildDate `date -u +.%Y%m%d%.H%M%S`"
 		echo "Building Release"
 		goreleaser
