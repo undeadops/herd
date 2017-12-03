@@ -2,45 +2,44 @@
 
 Because naming is hard.
 
-AWS CLI for getting to the most needed info I use everyday 
-but dont want to open the AWS Console to look up. 
+AWS CLI for getting to the most needed info I use everyday
+but don't want to open the AWS Console to look up.
 
 Modeled after projects such as acli and jungle.  Both python
 projects.  Since they both are incomplete to what I wanted
-and I was looking for a project to learn Go.  I wrote herd
-as a way to do both.  
+and I was looking to learn more Go.  I wrote herd as a way to
+do both.  
 
-## Install MacOS
+## Installing
 
+### MacOS
 ```sh
 brew install undeadops/tap/herd
 ```
 
-## Build
+## Usage
 
-Building should be simply
+List all ec2 instances on your default AWS profile
 
-    go build -o herd *.go
+```sh
+herd ec2 ls
+```
 
-### Current Status
+List all ec2 instances off an AWS profile named development
+```sh
+herd --profile development ec2 ls
+```
 
-Currently ec2 searching works.  I will start adding more 
-and more services as time goes on.  I will try to stay
-on top of keeping the code base clean.  Pull requests 
-welcome. 
+There is some basic regexing built-in
+Searching EC2 instances by the name "*web*" on the development profile
+```sh
+herd --profile development ec2 list -f '*web*'
+```
 
-### Using
+I also have built-in the ability to pull up instances based of of tag names
+Searching EC@ for instances with the cost_center that equals elasticsearch
+```sh
+herd ec2 ls -t 'cost_center=elasticsearch'
+```
 
-Running it in is current form should be fairly simple.
-
-    ./herd ec2 ls -f '*web*'
-
-Will search EC2 instances by the name "*web*"
-
-    ./herd --profile devacct ec2 list -f '*web*'
-
-Utilizing multiple AWS profiles.  This will preform the same
-list but using the devacct AWS profile.
-
-
-
+These should also all still work with the rds and elb types as well. 
