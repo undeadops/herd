@@ -15,8 +15,8 @@ import (
 func printEc2Instances(instances []map[string]string) error {
 	for _, i := range instances {
 		fmt.Printf(
-			"\x1b[33m%-25s\x1b[0m\t%-20s\t%-7s\t%-26s\t%-15s\t%-15s\t%-15s\n",
-			i["name"], i["id"], i["state"], i["role"], i["cost_center"], i["ipAddress"], i["publicIpAddress"])
+			"\x1b[33m%-25s\x1b[0m\t%-20s\t%-7s\t%-26s\t%-15s\t%-15s\t%-15s\t%-10s\n",
+			i["name"], i["id"], i["state"], i["role"], i["cost_center"], i["ipAddress"], i["publicIpAddress"], i["ami"])
 	}
 	return nil
 }
@@ -42,7 +42,7 @@ func ec2List(c *cli.Context) error {
 		log.Fatal(err.Error())
 	}
 
-	for res, _ := range resp.Reservations {
+	for res := range resp.Reservations {
 		for _, instances := range resp.Reservations[res].Instances {
 			name := "None"
 			costCenter := "None"
@@ -73,6 +73,7 @@ func ec2List(c *cli.Context) error {
 				"cost_center":  costCenter,
 				"env":          env,
 				"role":         role,
+				"ami":          *instances.ImageId,
 			}
 			if instances.PublicIpAddress != nil {
 				i["publicIpAddress"] = *instances.PublicIpAddress
