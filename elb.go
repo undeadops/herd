@@ -8,18 +8,24 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/elb"
+	"github.com/gosuri/uitable"
 
 	"github.com/fatih/color"
 	"github.com/urfave/cli"
 )
 
 func printElb(elb []map[string]string) error {
+	table := uitable.New()
+	table.AddRow("NAME", "Members", "IN:OUT", "Availability", "DNS")
 	for _, e := range elb {
-		fmt.Printf(
-			"%-45s\t%-3s\t%-2s:%-2s\t%-15s\t%-50s\n",
-			color.YellowString(e["name"]), e["numInstances"], color.GreenString(e["instances_in"]),
-			color.RedString(e["instances_out"]), e["scheme"], e["dns"])
+		table.AddRow(color.YellowString(e["name"]),
+			e["numInstances"],
+			color.GreenString(e["instances_in"])+":"+color.RedString(e["instances_out"]),
+			e["scheme"],
+			e["dns"],
+		)
 	}
+	fmt.Println(table)
 	return nil
 }
 

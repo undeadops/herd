@@ -50,6 +50,12 @@
 			"revisionTime": "2018-07-19T07:19:42Z"
 		},
 		{
+			"checksumSHA1": "cACEkFM7kIL+NVF6jSJPY2tW4d8=",
+			"path": "github.com/gosuri/uitable",
+			"revision": "36ee7e946282a3fb1cfecd476ddc9b35d8847e42",
+			"revisionTime": "2016-04-04T20:39:58Z"
+		},
+		{
 			"checksumSHA1": "l2CJX8X2+faB4Ja9jUaOFNdrzY0=",
 			"path": "github.com/gucumber/gucumber",
 			"revision": "7d5c79e832a25825dbed83e78f8484d4ffe8ec16",

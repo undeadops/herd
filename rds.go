@@ -7,16 +7,21 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/fatih/color"
+	"github.com/gosuri/uitable"
 	"github.com/urfave/cli"
 )
 
 func printRds(dbs []map[string]string) error {
+	table := uitable.New()
+	table.AddRow("NAME", "ENGINE", "VERSION", "IS_PUBLIC", "ENDPOINT")
 	for _, r := range dbs {
-		fmt.Printf(
-			"%-28s\t%s:%s\t%-18s\t%-50s\n",
-			color.YellowString(r["name"]), r["engine"], r["engine_version"],
-			r["isPublic"], r["endpoint"])
+		// fmt.Printf(
+		// 	"%-28s\t%s:%s\t%-18s\t%-50s\n",
+		// 	color.YellowString(r["name"]), r["engine"], r["engine_version"],
+		// 	r["isPublic"], r["endpoint"])
+		table.AddRow(color.YellowString(r["name"]), r["engine"], r["engine_version"], r["isPublic"], r["endpoint"])
 	}
+	fmt.Println(table)
 	return nil
 }
 
