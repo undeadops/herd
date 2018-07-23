@@ -8,6 +8,13 @@ builds:
       - windows
     goarch:
       - amd64
+      - 386
+      - arm
+      - arm64
+    ignore:
+      - goos: openbsd
+        goarch: arm
+        goarm: 6
 checksum:
   # You can change the name of the checksums file.
   # This is parsed with the Go template engine and the following variables

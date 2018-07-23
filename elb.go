@@ -5,46 +5,75 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/elb"
+	"github.com/aws/aws-sdk-go-v2/aws/awserr"
+	"github.com/aws/aws-sdk-go-v2/aws/external"
+	"github.com/aws/aws-sdk-go-v2/service/elb"
+	"github.com/gosuri/uitable"
+
 	"github.com/fatih/color"
 	"github.com/urfave/cli"
 )
 
 func printElb(elb []map[string]string) error {
+	table := uitable.New()
+	table.AddRow("NAME", "Members", "IN:OUT", "Availability", "DNS")
 	for _, e := range elb {
-		fmt.Printf(
-			"%-45s\t%-3s\t%-2s:%-2s\t%-15s\t%-50s\n",
-			color.YellowString(e["name"]), e["numInstances"], color.GreenString(e["instances_in"]),
-			color.RedString(e["instances_out"]), e["scheme"], e["dns"])
+		table.AddRow(color.YellowString(e["name"]),
+			e["numInstances"],
+			color.GreenString(e["instances_in"])+":"+color.RedString(e["instances_out"]),
+			e["scheme"],
+			e["dns"],
+		)
 	}
+	fmt.Println(table)
 	return nil
 }
 
 func elbList(c *cli.Context) error {
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-		Profile:           awsProfile,
-	}))
+	cfg, err := external.LoadDefaultAWSConfig(
+		external.WithSharedConfigProfile(awsProfile),
+	)
+	if err != nil {
+		panic("unable to load SDK config, " + err.Error())
+	}
+
+	// TODO: Revisit this... what happens when profile isnt defaulted to us-east-1
+	cfg.Region = awsRegion
 
 	var elbList []map[string]string
 
-	elbsvc := elb.New(sess)
+	//elbsvc := elb.New(sess)
+	svc := elb.New(cfg)
 
 	// I don't want to filter results of ELB's
 	filter := &elb.DescribeLoadBalancersInput{}
 
-	loadbalancers, err := elbsvc.DescribeLoadBalancers(filter)
+	req := svc.DescribeLoadBalancersRequest(filter)
+	result, err := req.Send()
 	if err != nil {
-		fmt.Println("There was an error listing ELB Instances", err.Error())
-		log.Fatal(err.Error())
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case elb.ErrCodeAccessPointNotFoundException:
+				fmt.Println(elb.ErrCodeAccessPointNotFoundException, aerr.Error())
+			case elb.ErrCodeDependencyThrottleException:
+				fmt.Println(elb.ErrCodeDependencyThrottleException, aerr.Error())
+			default:
+				fmt.Println(aerr.Error())
+			}
+		} else {
+			// Print the error, cast err to awserr.Error to get the Code and
+			// Message from an error.
+			fmt.Println(err.Error())
+		}
+		return err
 	}
 
-	for _, lb := range loadbalancers.LoadBalancerDescriptions {
+	for _, lb := range result.LoadBalancerDescriptions {
 		elbfilter := &elb.DescribeInstanceHealthInput{
 			LoadBalancerName: lb.LoadBalancerName,
 		}
-		elbhealth, err := elbsvc.DescribeInstanceHealth(elbfilter)
+		req := svc.DescribeInstanceHealthRequest(elbfilter)
+		result, err := req.Send()
 		if err != nil {
 			fmt.Println("There was and error retreiving ELB Health", err.Error())
 			log.Fatal(err.Error())
@@ -53,7 +82,7 @@ func elbList(c *cli.Context) error {
 		noservice := 0
 		inservice := 0
 
-		for _, inst := range elbhealth.InstanceStates {
+		for _, inst := range result.InstanceStates {
 			switch state := *inst.State; state {
 			case "InService":
 				inservice++

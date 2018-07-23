@@ -4,39 +4,52 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/rds"
+	"github.com/aws/aws-sdk-go-v2/aws/external"
+	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/fatih/color"
+	"github.com/gosuri/uitable"
 	"github.com/urfave/cli"
 )
 
 func printRds(dbs []map[string]string) error {
+	table := uitable.New()
+	table.AddRow("NAME", "ENGINE", "VERSION", "IS_PUBLIC", "ENDPOINT")
 	for _, r := range dbs {
-		fmt.Printf(
-			"%-28s\t%s:%s\t%-18s\t%-50s\n",
-			color.YellowString(r["name"]), r["engine"], r["engine_version"],
-			r["isPublic"], r["endpoint"])
+		// fmt.Printf(
+		// 	"%-28s\t%s:%s\t%-18s\t%-50s\n",
+		// 	color.YellowString(r["name"]), r["engine"], r["engine_version"],
+		// 	r["isPublic"], r["endpoint"])
+		table.AddRow(color.YellowString(r["name"]), r["engine"], r["engine_version"], r["isPublic"], r["endpoint"])
 	}
+	fmt.Println(table)
 	return nil
 }
 
 func rdsList(c *cli.Context) error {
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-		Profile:           awsProfile,
-	}))
 
-	var rdsList []map[string]string
+	cfg, err := external.LoadDefaultAWSConfig(
+		external.WithSharedConfigProfile(awsProfile),
+	)
+	if err != nil {
+		panic("unable to load SDK config, " + err.Error())
+	}
+
+	// TODO: Revisit this... what happens when profile isnt defaulted to us-east-1
+	cfg.Region = awsRegion
 
 	rdsFilter := &rds.DescribeDBInstancesInput{}
 
-	rdsSvc := rds.New(sess)
-	rdsInstances, err := rdsSvc.DescribeDBInstances(rdsFilter)
+	var rdsList []map[string]string
+
+	svc := rds.New(cfg)
+	req := svc.DescribeDBInstancesRequest(rdsFilter)
+	resp, err := req.Send()
 	if err != nil {
 		fmt.Println("There was an error listing RDS Instances", err.Error())
 		log.Fatal(err.Error())
 	}
-	for _, dbinst := range rdsInstances.DBInstances {
+
+	for _, dbinst := range resp.DBInstances {
 		r := map[string]string{
 			"name":           *dbinst.DBInstanceIdentifier,
 			"id":             *dbinst.DbiResourceId,

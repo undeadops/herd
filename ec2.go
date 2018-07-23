@@ -5,40 +5,49 @@ import (
 	"log"
 	"net/url"
 
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/aws/external"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+
+	"github.com/fatih/color"
+	"github.com/gosuri/uitable"
 	"github.com/urfave/cli"
 )
 
 //{{$ec2.Name}}\t\t{{$ec2.state}}\t{{$ec2.id}}\t{{$ec2.role}}\t{{$ec2.cost_center}}\t{{$ec2.env}}\t{{$ec2.instancetype}}\t{{$ec2.ipaddress}}\t{{$ec2.publicIpaddress}}
 
 func printEc2Instances(instances []map[string]string) error {
+	table := uitable.New()
+	table.AddRow("NAME", "ID", "STATE", "ROLE", "COST_CENTER", "IP Address", "PUBLIC ADDRESS", "AMI")
 	for _, i := range instances {
-		fmt.Printf(
-			"\x1b[33m%-25s\x1b[0m\t%-20s\t%-7s\t%-26s\t%-15s\t%-15s\t%-15s\t%-10s\n",
-			i["name"], i["id"], i["state"], i["role"], i["cost_center"], i["ipAddress"], i["publicIpAddress"], i["ami"])
+		table.AddRow(color.YellowString(i["name"]), i["id"], i["state"], i["role"], i["cost_center"], i["ipAddress"], i["publicIpAddress"], i["ami"])
 	}
+	fmt.Println(table)
 	return nil
 }
 
 func ec2List(c *cli.Context) error {
-	fmt.Println("EC2 List Instances")
-	fmt.Println("AWS Config Profile: ", awsProfile)
+	cfg, err := external.LoadDefaultAWSConfig(
+		external.WithSharedConfigProfile(awsProfile),
+	)
+	if err != nil {
+		panic("unable to load SDK config, " + err.Error())
+	}
+
+	// TODO: Revisit this... what happens when profile isnt defaulted to us-east-1
+	cfg.Region = awsRegion
 
 	var ec2instances []map[string]string
 
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-		Profile:           awsProfile,
-	}))
-
-	ec2svc := ec2.New(sess)
 	params := &ec2.DescribeInstancesInput{
 		Filters: generateFilter(),
 	}
-	resp, err := ec2svc.DescribeInstances(params)
+
+	svc := ec2.New(cfg)
+
+	req := svc.DescribeInstancesRequest(params)
+	resp, err := req.Send()
 	if err != nil {
-		fmt.Println("there was an error listing instances in", err.Error())
+		fmt.Println("there was an error listing instances in", err)
 		log.Fatal(err.Error())
 	}
 
@@ -62,14 +71,19 @@ func ec2List(c *cli.Context) error {
 					role = url.QueryEscape(*keys.Value)
 				}
 			}
+
+			instanceType, _ := instances.InstanceType.MarshalValue()
+			stateName, _ := instances.InstanceType.MarshalValue()
+			arch, _ := instances.Architecture.MarshalValue()
+
 			i := map[string]string{
 				"id":           *instances.InstanceId,
 				"name":         name,
 				"ipAddress":    *instances.PrivateIpAddress,
-				"instanceType": *instances.InstanceType,
+				"instanceType": instanceType,
 				"keyName":      *instances.KeyName,
-				"state":        *instances.State.Name,
-				"arch":         *instances.Architecture,
+				"state":        stateName,
+				"arch":         arch,
 				"cost_center":  costCenter,
 				"env":          env,
 				"role":         role,
